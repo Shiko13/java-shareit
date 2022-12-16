@@ -23,6 +23,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final ItemDtoConverterImpl itemDtoConverterImpl;
+
     @Override
     public List<ItemDto> getAll(long sharerId) {
         log.debug("Start request GET to /items");

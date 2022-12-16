@@ -34,14 +34,14 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long sharerId,
-                              @Valid @RequestBody ItemDto ItemDto) {
-        return itemService.create(sharerId, ItemDto);
+                              @Valid @RequestBody ItemDto itemDto) {
+        return itemService.create(sharerId, itemDto);
     }
 
     @PatchMapping("/{id}")
     public ItemDto patchItem(@RequestHeader("X-Sharer-User-Id") long sharerId,
-                             @PathVariable long id, @Validated(ItemValidated.class) @RequestBody ItemDto ItemDto) {
-        return itemService.update(sharerId, id, ItemDto);
+                             @PathVariable long id, @Validated(ItemValidated.class) @RequestBody ItemDto itemDto) {
+        return itemService.update(sharerId, id, itemDto);
     }
 
     @DeleteMapping("/{id}")

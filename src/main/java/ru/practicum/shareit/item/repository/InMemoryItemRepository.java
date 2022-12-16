@@ -12,6 +12,7 @@ public class InMemoryItemRepository implements ItemRepository {
     private final Map<Long, Item> items = new HashMap<>();
     private final Map<Long, Set<Long>> sharersWithItems = new HashMap<>();
     private long count = 1;
+
     @Override
     public Optional<Item> findById(long id) {
         return Optional.ofNullable(items.get(id));
