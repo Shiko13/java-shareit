@@ -9,7 +9,7 @@ public interface ItemService {
 
     ItemDto getById(long id);
 
-    List <ItemDto> getByText(String text);
+    List<ItemDto> getByText(String text);
 
     ItemDto create(long sharerId, ItemDto itemDto);
 
