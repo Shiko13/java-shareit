@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.model.User;
 
 @Component
-public class UserUserDtoConverterImpl implements UserDtoConverter {
+public class UserDtoConverterImpl implements UserDtoConverter {
 
     @Override
     public UserDto toDto(User user) {

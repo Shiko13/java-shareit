@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoConverterImpl;
+import ru.practicum.shareit.item.dto.ItemDtoConverter;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,14 +21,14 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final ItemDtoConverterImpl itemDtoConverterImpl;
+    private final ItemDtoConverter itemDtoConverter;
 
     @Override
     public List<ItemDto> getAll(long sharerId) {
         log.debug("Start request GET to /items");
         return itemRepository.findAll(sharerId)
                 .stream()
-                .map(itemDtoConverterImpl::toDto)
+                .map(itemDtoConverter::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -39,20 +38,16 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException("Item with id = " + id + " not found"));
-        return itemDtoConverterImpl.toDto(item);
+        return itemDtoConverter.toDto(item);
     }
 
     @Override
     public List<ItemDto> getByText(String text) {
         log.debug("Start request GET to /items/search?text={}", text);
-        if (text.equals("")) {
-            return new ArrayList<>();
-        } else {
-            return itemRepository.findByText(text)
-                    .stream()
-                    .map(itemDtoConverterImpl::toDto)
-                    .collect(Collectors.toList());
-        }
+        return itemRepository.findByText(text)
+                .stream()
+                .map(itemDtoConverter::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -62,8 +57,8 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(sharerId)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + sharerId + " not found"));
-        Item item = itemDtoConverterImpl.fromDto(sharerId, itemDto);
-        return itemDtoConverterImpl.toDto(itemRepository.save(item));
+        Item item = itemDtoConverter.fromDto(sharerId, itemDto);
+        return itemDtoConverter.toDto(itemRepository.save(item));
     }
 
     @Override
@@ -76,14 +71,16 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() ->
                         new NotFoundException("Item with id = " + id + " not found"));
         itemDto.setId(id);
-        item = update(sharerId, itemDto, item);
-        return itemDtoConverterImpl.toDto(itemRepository.update(item));
+        if (item.getSharerId() != sharerId) {
+            throw new NotFoundException("Item with this id not found in this user");
+        }
+        return itemDtoConverter.toDto(update(itemDto, item));
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(long sharerId, long id) {
         log.debug("Start request DELETE to /items/{}", id);
-        itemRepository.deleteById(id);
+        itemRepository.deleteById(sharerId, id);
     }
 
     @Override
@@ -92,16 +89,16 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteAll();
     }
 
-    private Item update(long sharerId, ItemDto itemDto, Item item) {
-        if (itemDto.getName() == null) {
-            itemDto.setName(item.getName());
+    private Item update(ItemDto itemDto, Item item) {
+        if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
+            item.setName(itemDto.getName());
         }
-        if (itemDto.getDescription() == null) {
-            itemDto.setDescription(item.getDescription());
+        if (itemDto.getDescription() != null && !item.getDescription().isBlank()) {
+            item.setDescription(itemDto.getDescription());
         }
-        if (itemDto.getAvailable() == null) {
-            itemDto.setAvailable(item.getAvailable());
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
         }
-        return itemDtoConverterImpl.fromDto(sharerId, itemDto);
+        return item;
     }
 }

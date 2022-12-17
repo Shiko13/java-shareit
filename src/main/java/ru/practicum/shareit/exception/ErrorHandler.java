@@ -47,4 +47,11 @@ public class ErrorHandler {
         log.info("500 {}", e.getMessage());
         return e.getMessage();
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleUncheckedException(Throwable e) {
+        log.info("500 {}", e.getMessage());
+        return e.getMessage();
+    }
 }

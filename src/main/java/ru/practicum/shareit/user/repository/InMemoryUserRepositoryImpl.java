@@ -25,14 +25,13 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user) {
-        if (emails.contains(user.getEmail())) {
-            throw new ServerException("This email already has been registered");
-        }
+        emailCheckDuplicate(user.getEmail());
         user.setId(count++);
         users.put(user.getId(), user);
         emails.add(user.getEmail());
         return user;
     }
+
 
     @Override
     public User update(User user) {
@@ -40,9 +39,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
             String oldEmail = users.get(user.getId()).getEmail();
             String newEmail = user.getEmail();
             if (!oldEmail.equals(newEmail)) {
-                if (emails.contains(newEmail)) {
-                    throw new ServerException("This email already has been registered");
-                }
+                emailCheckDuplicate(newEmail);
                 emails.remove(oldEmail);
                 emails.add(newEmail);
             }
@@ -63,5 +60,15 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     public void deleteAll() {
         emails.clear();
         users.clear();
+    }
+
+    public Set<String> getEmails() {
+        return emails;
+    }
+
+    private void emailCheckDuplicate(String user) {
+        if (emails.contains(user)) {
+            throw new ServerException("This email already has been registered");
+        }
     }
 }

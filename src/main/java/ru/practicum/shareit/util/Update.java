@@ -1,4 +1,4 @@
 package ru.practicum.shareit.util;
 
-public interface ItemValidated {
+public interface Update {
 }

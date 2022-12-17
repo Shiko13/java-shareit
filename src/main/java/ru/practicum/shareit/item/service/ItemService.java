@@ -15,7 +15,7 @@ public interface ItemService {
 
     ItemDto update(long sharerId, long id, ItemDto itemDto);
 
-    void deleteById(long id);
+    void deleteById(long sharerId, long id);
 
     void deleteAll();
 }

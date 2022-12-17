@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ServerException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserUserDtoConverterImpl;
+import ru.practicum.shareit.user.dto.UserDtoConverter;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -19,14 +20,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserUserDtoConverterImpl userDtoConverterImpl;
+    private final UserDtoConverter userDtoConverter;
 
     @Override
     public List<UserDto> getAll() {
         log.debug("Start request GET to /users");
         return userRepository.findAll()
                 .stream()
-                .map(userDtoConverterImpl::toDto)
+                .map(userDtoConverter::toDto)
                 .collect(Collectors.toList());
 
     }
@@ -37,15 +38,15 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + id + " not found"));
-        return userDtoConverterImpl.toDto(user);
+        return userDtoConverter.toDto(user);
     }
 
     @Override
     public UserDto create(UserDto userDto) {
         log.debug("Start request POST to /users, with id = {}, name = {}, email = {}",
                 userDto.getId(), userDto.getName(), userDto.getEmail());
-        User user = userDtoConverterImpl.fromDto(userDto);
-        return userDtoConverterImpl.toDto(userRepository.save(user));
+        User user = userDtoConverter.fromDto(userDto);
+        return userDtoConverter.toDto(userRepository.save(user));
     }
 
     @Override
@@ -55,8 +56,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                 new NotFoundException("User with id = " + id + " not found"));
         userDto.setId(id);
-        user = update(userDto, user);
-        return userDtoConverterImpl.toDto(userRepository.update(user));
+        return userDtoConverter.toDto(update(userDto, user));
     }
 
     @Override
@@ -72,12 +72,19 @@ public class UserServiceImpl implements UserService {
     }
 
     private User update(UserDto userDto, User user) {
-        if (userDto.getName() == null) {
-            userDto.setName(user.getName());
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
         }
-        if (userDto.getEmail() == null) {
-            userDto.setEmail(user.getEmail());
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            if (!user.getEmail().equals(userDto.getEmail())) {
+                if (userRepository.getEmails().contains(userDto.getEmail())) {
+                    throw new ServerException("This email already has been registered");
+                }
+                userRepository.getEmails().remove(user.getEmail());
+                userRepository.getEmails().add(userDto.getEmail());
+            }
+            user.setEmail(userDto.getEmail());
         }
-        return userDtoConverterImpl.fromDto(userDto);
+        return user;
     }
 }

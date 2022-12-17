@@ -1,4 +1,4 @@
 package ru.practicum.shareit.util;
 
-public interface UserValidated {
+public interface Create {
 }
