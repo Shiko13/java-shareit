@@ -49,8 +49,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public void deleteById(long sharerId, long id) {
-        sharersWithItems.get(sharerId).remove(items.get(id));
-        items.remove(id);
+        sharersWithItems.get(sharerId).remove(items.remove(id));
     }
 
     @Override
