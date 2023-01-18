@@ -46,11 +46,13 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(sharerId)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + sharerId + " not found"));
+
         List<Item> items = itemRepository.findAllByOwner_Id_OrderByIdAsc(sharerId);
         List<ItemDtoWithBookingAndComments> itemDtoWithBookingAndComments = new ArrayList<>();
         for (Item item : items) {
             itemDtoWithBookingAndComments.add(getItemDtoWithBookingAndComments(sharerId, item));
         }
+
         return itemDtoWithBookingAndComments;
     }
 
@@ -63,24 +65,8 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException("Item with id = " + id + " not found"));
-        return getItemDtoWithBookingAndComments(sharerId, item);
-    }
 
-    private ItemDtoWithBookingAndComments getItemDtoWithBookingAndComments(long sharerId, Item item) {
-        BookingDtoOnlyIdAndBookerId lastBooking = null;
-        BookingDtoOnlyIdAndBookerId nextBooking = null;
-        if (item.getOwner().getId() == sharerId) {
-            lastBooking = bookingRepository.findLastBooking(item.getId())
-                    .map(bookingDtoConverter::toDtoOnlyIdAndBookerId)
-                    .orElse(null);
-            nextBooking = bookingRepository.findNextBooking(item.getId())
-                    .map(bookingDtoConverter::toDtoOnlyIdAndBookerId)
-                    .orElse(null);
-        }
-        List<CommentDto> comments = commentRepository.findByItem_Id(item.getId()).stream()
-                .map(commentDtoConverter::toDto)
-                .collect(Collectors.toList());
-        return itemDtoConverter.toDtoWithBookingAndComments(item, lastBooking, nextBooking, comments);
+        return getItemDtoWithBookingAndComments(sharerId, item);
     }
 
     @Override
@@ -101,23 +87,26 @@ public class ItemServiceImpl implements ItemService {
                         new NotFoundException("User with id = " + sharerId + " not found"));
         Item item = itemDtoConverter.fromDto(sharerId, itemDto);
         item.setOwner(owner);
+
         return itemDtoConverter.toDto(itemRepository.save(item));
     }
 
     @Override
     @Transactional
     public ItemDto update(long sharerId, long id, ItemDto itemDto) {
-        log.debug("Start request PATCH to /items, with id = {}", id);
+        log.debug("Start request PATCH to /items/{}", id);
         userRepository.findById(sharerId)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + sharerId + " not found"));
         Item item = itemRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException("Item with id = " + id + " not found"));
+
         if (!item.getOwner().getId().equals(sharerId)) {
             throw new NotFoundException("Item with this id not found in this user");
         }
         itemDto.setId(id);
+
         return itemDtoConverter.toDto(update(itemDto, item));
     }
 
@@ -135,18 +124,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto createComment(long userId, long itemId, CommentDto commentDto) {
+        log.debug("Start request POST to /items/{}/comment", itemId);
         User author = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + userId + " not found"));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() ->
                         new NotFoundException("Item with id = " + itemId + " not found"));
-        List<Booking> bookings = bookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsBefore(userId, itemId, LocalDateTime.now());
+
+        List<Booking> bookings = bookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsBefore(userId,
+                itemId, LocalDateTime.now());
         if (bookings.stream().findAny().isEmpty()) {
             throw new CommentAccessException("You are not booked this item");
         }
+
         Comment comment = commentDtoConverter.fromDto(commentDto, item, author);
         commentRepository.save(comment);
+
         return commentDtoConverter.toDto(comment);
     }
 
@@ -162,5 +156,22 @@ public class ItemServiceImpl implements ItemService {
         }
         itemRepository.save(item);
         return item;
+    }
+
+    private ItemDtoWithBookingAndComments getItemDtoWithBookingAndComments(long sharerId, Item item) {
+        BookingDtoOnlyIdAndBookerId lastBooking = null;
+        BookingDtoOnlyIdAndBookerId nextBooking = null;
+        if (item.getOwner().getId() == sharerId) {
+            lastBooking = bookingRepository.findLastBooking(item.getId())
+                    .map(bookingDtoConverter::toDtoOnlyIdAndBookerId)
+                    .orElse(null);
+            nextBooking = bookingRepository.findNextBooking(item.getId())
+                    .map(bookingDtoConverter::toDtoOnlyIdAndBookerId)
+                    .orElse(null);
+        }
+        List<CommentDto> comments = commentRepository.findByItem_Id(item.getId()).stream()
+                .map(commentDtoConverter::toDto)
+                .collect(Collectors.toList());
+        return itemDtoConverter.toDtoWithBookingAndComments(item, lastBooking, nextBooking, comments);
     }
 }

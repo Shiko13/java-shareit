@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto update(long id, UserDto userDto) {
-        log.debug("Start request PATCH to /users, with id = {}", id);
+        log.debug("Start request PATCH to /users/{}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
                 new NotFoundException("User with id = " + id + " not found"));
