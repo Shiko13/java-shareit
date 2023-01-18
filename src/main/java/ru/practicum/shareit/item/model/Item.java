@@ -32,6 +32,7 @@ public class Item {
     @OneToOne
     @JoinColumn(name = "request_id")
     private ItemRequest request;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,6 +40,7 @@ public class Item {
         Item item = (Item) o;
         return Objects.equals(id, item.id);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
