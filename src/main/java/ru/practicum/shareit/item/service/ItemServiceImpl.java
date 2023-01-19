@@ -10,10 +10,11 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.CommentAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.Comment.Comment;
-import ru.practicum.shareit.item.Comment.CommentDto;
-import ru.practicum.shareit.item.Comment.CommentDtoConverter;
-import ru.practicum.shareit.item.Comment.CommentRepository;
+import ru.practicum.shareit.item.Status;
+import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.item.comment.CommentDto;
+import ru.practicum.shareit.item.comment.CommentDtoConverter;
+import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoConverter;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookingAndComments;
@@ -26,7 +27,10 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -49,12 +53,15 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> items = itemRepository.findAllByOwner_Id_OrderByIdAsc(sharerId);
         List<ItemDtoWithBookingAndComments> itemDtoWithBookingAndComments = new ArrayList<>();
-        for (Item item : items) {
-            itemDtoWithBookingAndComments.add(getItemDtoWithBookingAndComments(sharerId, item));
-        }
+        Set<Long> itemsId = items.stream().map(Item::getId).collect(Collectors.toSet());
+        List<Comment> comments = commentRepository.findByItem_IdIn(itemsId);
+        List<Booking> bookings = bookingRepository.findByItem_IdInOrderByEndAsc(itemsId);
+
+        fillItemDtoWithBookingAndComments(items, itemDtoWithBookingAndComments, comments, bookings);
 
         return itemDtoWithBookingAndComments;
     }
+
 
     @Override
     public ItemDtoWithBookingAndComments getById(long sharerId, long id) {
@@ -75,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByText(text)
                 .stream()
                 .map(itemDtoConverter::toDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -85,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
         User owner = userRepository.findById(sharerId)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + sharerId + " not found"));
-        Item item = itemDtoConverter.fromDto(sharerId, itemDto);
+        Item item = itemDtoConverter.fromDto(itemDto, owner);
         item.setOwner(owner);
 
         return itemDtoConverter.toDto(itemRepository.save(item));
@@ -154,7 +161,6 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
-        itemRepository.save(item);
         return item;
     }
 
@@ -171,7 +177,43 @@ public class ItemServiceImpl implements ItemService {
         }
         List<CommentDto> comments = commentRepository.findByItem_Id(item.getId()).stream()
                 .map(commentDtoConverter::toDto)
-                .collect(Collectors.toList());
+                .collect(toList());
         return itemDtoConverter.toDtoWithBookingAndComments(item, lastBooking, nextBooking, comments);
+    }
+
+    private void fillItemDtoWithBookingAndComments(List<Item> items, List<ItemDtoWithBookingAndComments> itemDtoWithBookingAndComments, List<Comment> comments, List<Booking> bookings) {
+        for (Item item : items) {
+            List<CommentDto> commentDtos = new ArrayList<>();
+            for (Comment comment : comments) {
+                if (comment.getItem().equals(item)) {
+                    commentDtos.add(commentDtoConverter.toDto(comment));
+                }
+            }
+
+            List<Booking> lastBookings = bookings.stream()
+                    .filter(b -> b.getItem().equals(item))
+                    .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
+                    .filter(b -> b.getStatus().equals(Status.APPROVED))
+                    .limit(1)
+                    .collect(toList());
+            BookingDtoOnlyIdAndBookerId lastBooking = null;
+            if (lastBookings.size() != 0) {
+                lastBooking = bookingDtoConverter.toDtoOnlyIdAndBookerId(lastBookings.get(0));
+            }
+
+            List<Booking> nextBookings = bookings.stream()
+                    .filter(b -> b.getItem().equals(item))
+                    .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
+                    .filter(b -> b.getStatus().equals(Status.APPROVED))
+                    .limit(1)
+                    .collect(toList());
+            BookingDtoOnlyIdAndBookerId nextBooking = null;
+            if (nextBookings.size() != 0) {
+                nextBooking = bookingDtoConverter.toDtoOnlyIdAndBookerId(nextBookings.get(0));
+            }
+            itemDtoWithBookingAndComments.add(itemDtoConverter.toDtoWithBookingAndComments(
+                    item, lastBooking, nextBooking, commentDtos
+            ));
+        }
     }
 }

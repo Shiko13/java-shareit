@@ -11,7 +11,6 @@ import java.util.Objects;
 @Table(name = "requests")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemRequest {
@@ -24,7 +23,13 @@ public class ItemRequest {
     @Column(name = "description")
     private String description;
 
-    @OneToOne
+    public ItemRequest(Long id, String description, User requestor) {
+        this.id = id;
+        this.description = description;
+        this.requestor = requestor;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "requestor_id")
     private User requestor;
 
@@ -42,5 +47,15 @@ public class ItemRequest {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemRequest{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", requestor=" + requestor +
+                ", created=" + created +
+                '}';
     }
 }

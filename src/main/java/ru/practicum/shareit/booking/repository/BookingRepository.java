@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.Status;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -44,4 +45,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "select b.id, b.START_DATE, b.END_DATE, b.ITEM_ID, b.BOOKER_ID, b.status from bookings as b where b.ITEM_ID = ? " +
             "and b.START_DATE > now() order by b.START_DATE desc limit 1", nativeQuery = true)
     Optional<Booking> findNextBooking(long id);
+
+    List<Booking> findByItem_IdInOrderByEndAsc(Set<Long> itemsId);
 }

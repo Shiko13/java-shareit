@@ -11,7 +11,6 @@ import java.util.Objects;
 @Table(name = "items")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Item {
@@ -26,10 +25,10 @@ public class Item {
     private String description;
     @Column(name = "is_available")
     private Boolean available;
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private User owner;
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "request_id")
     private ItemRequest request;
 
@@ -44,5 +43,17 @@ public class Item {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", available=" + available +
+                ", owner=" + owner +
+                ", request=" + request +
+                '}';
     }
 }

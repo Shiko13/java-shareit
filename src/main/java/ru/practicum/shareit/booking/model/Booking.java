@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Table(name = "bookings")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Booking {
@@ -25,12 +24,26 @@ public class Booking {
     private LocalDateTime start;
     @Column(name = "end_date")
     private LocalDateTime end;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
+    @ToString.Exclude
     private Item item;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "booker_id")
+    @ToString.Exclude
     private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "id=" + id +
+                ", start=" + start +
+                ", end=" + end +
+                ", item=" + item +
+                ", booker=" + booker +
+                ", status=" + status +
+                '}';
+    }
 }

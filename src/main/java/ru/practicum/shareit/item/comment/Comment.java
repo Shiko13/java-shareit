@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.Comment;
+package ru.practicum.shareit.item.comment;
 
 import lombok.*;
 import ru.practicum.shareit.item.model.Item;
@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
@@ -22,12 +21,25 @@ public class Comment {
     private Long id;
     @Column(name = "text")
     private String text;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
+    @ToString.Exclude
     private Item item;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "author_id")
+    @ToString.Exclude
     private User author;
     @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", item=" + item +
+                ", author=" + author +
+                ", created=" + created +
+                '}';
+    }
 }
