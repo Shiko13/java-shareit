@@ -12,6 +12,8 @@ public interface ItemDtoConverter {
 
     Item fromDto(ItemDto itemDto, User owner);
 
+    Item fromDtoInput(ItemDtoInput itemDto, User owner);
+
     ItemDtoWithBookingAndComments toDtoWithBookingAndComments(Item item,
                                                               BookingDtoOnlyIdAndBookerId lastBooking,
                                                               BookingDtoOnlyIdAndBookerId nextBooking,

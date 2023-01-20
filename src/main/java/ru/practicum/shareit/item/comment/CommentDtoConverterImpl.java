@@ -11,7 +11,6 @@ public class CommentDtoConverterImpl implements CommentDtoConverter {
     @Override
     public CommentDto toDto(Comment comment) {
         return new CommentDto(comment.getId(), comment.getText(),
-                comment.getItem().getId(), comment.getAuthor().getId(),
                 comment.getAuthor().getName(), comment.getCreated());
     }
 

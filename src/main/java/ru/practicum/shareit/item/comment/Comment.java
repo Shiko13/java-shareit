@@ -23,11 +23,9 @@ public class Comment {
     private String text;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
-    @ToString.Exclude
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "author_id")
-    @ToString.Exclude
     private User author;
     @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
@@ -37,8 +35,6 @@ public class Comment {
         return "Comment{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", item=" + item +
-                ", author=" + author +
                 ", created=" + created +
                 '}';
     }

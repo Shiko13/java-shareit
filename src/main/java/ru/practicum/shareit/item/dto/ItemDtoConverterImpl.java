@@ -36,6 +36,13 @@ public class ItemDtoConverterImpl implements ItemDtoConverter {
     }
 
     @Override
+    public Item fromDtoInput(ItemDtoInput itemDto, User owner) {
+        return new Item(itemDto.getId(), itemDto.getName(),
+                itemDto.getDescription(), itemDto.getAvailable(),
+                owner, null);
+    }
+
+    @Override
     public ItemDtoWithBookingAndComments toDtoWithBookingAndComments(Item item,
                                                                      BookingDtoOnlyIdAndBookerId lastBooking,
                                                                      BookingDtoOnlyIdAndBookerId nextBooking,

@@ -26,11 +26,9 @@ public class Booking {
     private LocalDateTime end;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
-    @ToString.Exclude
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "booker_id")
-    @ToString.Exclude
     private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -41,8 +39,6 @@ public class Booking {
                 "id=" + id +
                 ", start=" + start +
                 ", end=" + end +
-                ", item=" + item +
-                ", booker=" + booker +
                 ", status=" + status +
                 '}';
     }

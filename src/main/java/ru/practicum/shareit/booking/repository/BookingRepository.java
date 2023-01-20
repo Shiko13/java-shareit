@@ -38,13 +38,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findBookingsByBooker_IdAndItem_IdAndEndIsBefore(long bookerId, long itemId, LocalDateTime localDateTime);
 
-    @Query(value = "select b.id, b.start_date, b.end_date, b.item_id, b.booker_id, b.status from bookings as b where b.ITEM_ID = ? " +
-            "and b.START_DATE < now() order by b.END_DATE desc limit 1", nativeQuery = true)
-    Optional<Booking> findLastBooking(long id);
+    Optional<Booking> findFirstByItem_IdAndStartBeforeOrderByEndDesc(long id, LocalDateTime localDateTime);
 
-    @Query(value = "select b.id, b.START_DATE, b.END_DATE, b.ITEM_ID, b.BOOKER_ID, b.status from bookings as b where b.ITEM_ID = ? " +
-            "and b.START_DATE > now() order by b.START_DATE desc limit 1", nativeQuery = true)
-    Optional<Booking> findNextBooking(long id);
+//    @Query(value = "select b.id, b.START_DATE, b.END_DATE, b.ITEM_ID, b.BOOKER_ID, b.status from bookings as b where b.ITEM_ID = ? " +
+//            "and b.START_DATE > now() order by b.START_DATE desc limit 1", nativeQuery = true)
+    Optional<Booking> findFirstByItem_IdAndStartAfterOrderByEndDesc(long id, LocalDateTime localDateTime);
 
-    List<Booking> findByItem_IdInOrderByEndAsc(Set<Long> itemsId);
+    @Query(value = "select b from Booking as b where b.item.id in ?1 and b.status = 'APPROVED'" +
+            " and b.start <= current_timestamp order by b.end asc")
+    List<Booking> findFirstByItem_IdInAndStartBeforeOrderByEndAsc(Set<Long> itemsId);
+
+    @Query(value = "select b from Booking as b where b.item.id in ?1 and b.status = 'APPROVED'" +
+            " and b.start >= current_timestamp order by b.end desc")
+    List<Booking> findFirstByItem_IdInAndStartAfterOrderByEndDesc(Set<Long> itemsId);
 }

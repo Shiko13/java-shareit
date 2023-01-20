@@ -17,8 +17,6 @@ public class CommentDto {
     private Long id;
     @NotBlank
     private String text;
-    private Long itemId;
-    private Long authorId;
     private String authorName;
     private LocalDateTime created;
 }
