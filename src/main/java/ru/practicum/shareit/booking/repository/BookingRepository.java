@@ -40,8 +40,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findFirstByItem_IdAndStartBeforeOrderByEndDesc(long id, LocalDateTime localDateTime);
 
-//    @Query(value = "select b.id, b.START_DATE, b.END_DATE, b.ITEM_ID, b.BOOKER_ID, b.status from bookings as b where b.ITEM_ID = ? " +
-//            "and b.START_DATE > now() order by b.START_DATE desc limit 1", nativeQuery = true)
     Optional<Booking> findFirstByItem_IdAndStartAfterOrderByEndDesc(long id, LocalDateTime localDateTime);
 
     @Query(value = "select b from Booking as b where b.item.id in ?1 and b.status = 'APPROVED'" +
