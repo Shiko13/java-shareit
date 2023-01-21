@@ -36,8 +36,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDtoOutput create(long userId, BookingDtoInput bookingDto) {
         log.debug("Start request POST to /bookings");
-        if (!bookingDto.getStart().isBefore(bookingDto.getEnd()) ||
-                bookingDto.getStart().equals(bookingDto.getEnd())) {
+        if (!bookingDto.getStart().isBefore(bookingDto.getEnd())) {
             throw new TimeException("You are not in Nolan movie :)");
         }
 

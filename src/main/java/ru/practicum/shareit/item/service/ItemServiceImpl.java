@@ -25,10 +25,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -60,11 +57,11 @@ public class ItemServiceImpl implements ItemService {
         Map<Item, List<Comment>> commentsByItem = comments.stream()
                 .collect(groupingBy(Comment::getItem, toList()));
 
-        List<Booking> lastBookings = bookingRepository.findFirstByItem_IdInAndStartBeforeOrderByEndAsc(itemsId);
+        List<Booking> lastBookings = bookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemsId);
         Map<Item, List<Booking>> bookingsByItem = lastBookings.stream()
                 .collect(groupingBy(Booking::getItem, toList()));
 
-        List<Booking> nextBookings = bookingRepository.findFirstByItem_IdInAndStartAfterOrderByEndDesc(itemsId);
+        List<Booking> nextBookings = bookingRepository.findByItem_IdInAndStartAfterOrderByEndAsc(itemsId);
         Map<Item, List<Booking>> bookingsByItem2 = nextBookings.stream()
                 .collect(groupingBy(Booking::getItem, toList()));
 
@@ -200,7 +197,7 @@ public class ItemServiceImpl implements ItemService {
                                                    Map<Item, List<Booking>> bookingsByItem,
                                                    Map<Item, List<Booking>> bookingsByItem2) {
         for (Item item : items) {
-            List<CommentDto> commentsDto;
+            List<CommentDto> commentsDto = null;
             BookingDtoOnlyIdAndBookerId lastBooking = null;
             BookingDtoOnlyIdAndBookerId nextBooking = null;
 
@@ -208,8 +205,6 @@ public class ItemServiceImpl implements ItemService {
                 commentsDto = commentsByItem.get(item).stream()
                         .map(commentDtoConverter::toDto)
                         .collect(toList());
-            } else {
-                commentsDto = new ArrayList<>();
             }
 
             if (bookingsByItem.get(item) != null) {
