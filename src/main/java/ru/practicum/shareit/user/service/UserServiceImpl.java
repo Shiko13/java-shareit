@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ServerException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoConverter;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,8 +50,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(long id, UserDto userDto) {
-        log.debug("Start request PATCH to /users, with id = {}", id);
+        log.debug("Start request PATCH to /users/{}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
                 new NotFoundException("User with id = " + id + " not found"));
@@ -76,13 +77,6 @@ public class UserServiceImpl implements UserService {
             user.setName(userDto.getName());
         }
         if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            if (!user.getEmail().equals(userDto.getEmail())) {
-                if (userRepository.getEmails().contains(userDto.getEmail())) {
-                    throw new ServerException("This email already has been registered");
-                }
-                userRepository.getEmails().remove(user.getEmail());
-                userRepository.getEmails().add(userDto.getEmail());
-            }
             user.setEmail(userDto.getEmail());
         }
         return user;
