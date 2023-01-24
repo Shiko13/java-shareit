@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.model;
 
 import lombok.*;
 import ru.practicum.shareit.user.model.User;
@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "requests")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "requests")
 public class ItemRequest {
 
     @Id
@@ -23,18 +23,13 @@ public class ItemRequest {
     @Column(name = "description")
     private String description;
 
-    public ItemRequest(Long id, String description, User requestor) {
-        this.id = id;
-        this.description = description;
-        this.requestor = requestor;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "requestor_id")
     private User requestor;
 
-    @Transient
+    @Column(name = "created")
     private LocalDateTime created;
+
 
     @Override
     public boolean equals(Object o) {
@@ -54,7 +49,6 @@ public class ItemRequest {
         return "ItemRequest{" +
                 "id=" + id +
                 ", description='" + description + '\'' +
-                ", requestor=" + requestor +
                 ", created=" + created +
                 '}';
     }

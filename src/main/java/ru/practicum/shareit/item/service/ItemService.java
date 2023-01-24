@@ -8,11 +8,11 @@ import ru.practicum.shareit.item.dto.ItemDtoWithBookingAndComments;
 import java.util.List;
 
 public interface ItemService {
-    List<ItemDtoWithBookingAndComments> getAll(long sharerId);
+    List<ItemDtoWithBookingAndComments> getAll(long sharerId, int from, int size);
 
     ItemDtoWithBookingAndComments getById(long sharerId, long id);
 
-    List<ItemDto> getByText(String text);
+    List<ItemDto> getByText(String text, int from, int size);
 
     ItemDto create(long sharerId, ItemDtoInput itemDto);
 

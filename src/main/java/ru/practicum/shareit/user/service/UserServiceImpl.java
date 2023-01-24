@@ -20,14 +20,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserDtoConverter userDtoConverter;
 
     @Override
     public List<UserDto> getAll() {
         log.debug("Start request GET to /users");
         return userRepository.findAll()
                 .stream()
-                .map(userDtoConverter::toDto)
+                .map(UserDtoConverter::toDto)
                 .collect(Collectors.toList());
 
     }
@@ -38,15 +37,15 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException("User with id = " + id + " not found"));
-        return userDtoConverter.toDto(user);
+        return UserDtoConverter.toDto(user);
     }
 
     @Override
     public UserDto create(UserDto userDto) {
         log.debug("Start request POST to /users, with id = {}, name = {}, email = {}",
                 userDto.getId(), userDto.getName(), userDto.getEmail());
-        User user = userDtoConverter.fromDto(userDto);
-        return userDtoConverter.toDto(userRepository.save(user));
+        User user = UserDtoConverter.fromDto(userDto);
+        return UserDtoConverter.toDto(userRepository.save(user));
     }
 
     @Override
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                 new NotFoundException("User with id = " + id + " not found"));
         userDto.setId(id);
-        return userDtoConverter.toDto(update(userDto, user));
+        return UserDtoConverter.toDto(update(userDto, user));
     }
 
     @Override
