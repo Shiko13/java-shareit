@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDtoInput;
 import ru.practicum.shareit.booking.dto.BookingDtoOutput;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.Status;
@@ -134,6 +135,7 @@ class BookingControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+
     @Test
     void shouldUpdateStatus() throws Exception {
         Mockito
@@ -156,6 +158,25 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.booker.id", is(approved.getBooker().getId()), Long.class))
                 .andExpect(jsonPath("$.booker.name", is(approved.getBooker().getName())))
                 .andExpect(jsonPath("$.status", is(approved.getStatus().name())));
+
+        Mockito.verify(bookingService, Mockito.times(1))
+                .updateStatus(2L, 4L, true);
+    }
+
+    @Test
+    void updateStatus_shouldThrowException() throws Exception {
+        Mockito
+                .when(bookingService.updateStatus(anyLong(), anyLong(), eq(true)))
+                .thenThrow(new AccessException("You are not owner of this item"));
+
+        mvc.perform(
+                        patch("/bookings/{bookingId}", bookingDto.getId())
+                                .header("X-Sharer-User-Id", userIrina.getId())
+                                .param("approved", "true")
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound());
 
         Mockito.verify(bookingService, Mockito.times(1))
                 .updateStatus(2L, 4L, true);

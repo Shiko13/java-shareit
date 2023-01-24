@@ -32,8 +32,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
@@ -153,12 +152,24 @@ class ItemServiceImplTest {
     @Test
     void getById_shouldThrowExceptionIfItemNotExist() {
         lenient()
-                .when(mockItemRepository.findById(54L))
+                .when(mockItemRepository.findById(99L))
                 .thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
-                () -> itemService.getById(userIrina.getId(), 54L)
+                () -> itemService.getById(userIrina.getId(), 99L)
+        );
+    }
+
+    @Test
+    void getById_shouldThrowExceptionIfUserNotExist() {
+        lenient()
+                .when(mockUserRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                NotFoundException.class,
+                () -> itemService.getById(99L, userIrina.getId())
         );
     }
 
@@ -243,6 +254,68 @@ class ItemServiceImplTest {
                 null,
                 null,
                 null
+        );
+        List<ItemDtoWithBookingAndComments> actual = itemService.getAll(userIrina.getId(), 0, 1);
+
+        assertEquals(List.of(expected), actual);
+    }
+
+    @Test
+    void getAll_shouldSuccessIfCommentSizeNotNull() {
+        Mockito
+                .when(mockItemRepository.findAllByOwner_Id_OrderByIdAsc(userIrina.getId(), PageRequest.of(0, 1)))
+                .thenReturn(List.of(dryer));
+        Mockito
+                .when(mockUserRepository.findById(userIrina.getId()))
+                .thenReturn(Optional.of(userIrina));
+        lenient()
+                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemIds))
+                .thenReturn(List.of(lastBooking, nextBooking));
+        Mockito
+                .when(mockCommentRepository.findByItem_IdIn(anySet()))
+                .thenReturn(List.of(comment));
+        ItemDtoWithBookingAndComments expected = new ItemDtoWithBookingAndComments(
+                dryer.getId(),
+                dryer.getName(),
+                dryer.getDescription(),
+                dryer.getAvailable(),
+                null,
+                null,
+                List.of(commentDto)
+        );
+        List<ItemDtoWithBookingAndComments> actual = itemService.getAll(userIrina.getId(), 0, 1);
+
+        assertEquals(List.of(expected), actual);
+    }
+
+    @Test
+    void getAll_shouldSuccessIfBookingsByItemNotNull() {
+        Mockito
+                .when(mockItemRepository.findAllByOwner_Id_OrderByIdAsc(userIrina.getId(), PageRequest.of(0, 1)))
+                .thenReturn(List.of(dryer));
+        Mockito
+                .when(mockUserRepository.findById(userIrina.getId()))
+                .thenReturn(Optional.of(userIrina));
+        lenient()
+                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemIds))
+                .thenReturn(List.of(lastBooking, nextBooking));
+        Mockito
+                .when(mockCommentRepository.findByItem_IdIn(anySet()))
+                .thenReturn(List.of(comment));
+        Mockito
+                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(anySet()))
+                .thenReturn(List.of(lastBooking));
+        Mockito
+                .when(mockBookingRepository.findByItem_IdInAndStartAfterOrderByEndAsc(anySet()))
+                .thenReturn(List.of(nextBooking));
+        ItemDtoWithBookingAndComments expected = new ItemDtoWithBookingAndComments(
+                dryer.getId(),
+                dryer.getName(),
+                dryer.getDescription(),
+                dryer.getAvailable(),
+                lastBookingShort,
+                nextBookingShort,
+                List.of(commentDto)
         );
         List<ItemDtoWithBookingAndComments> actual = itemService.getAll(userIrina.getId(), 0, 1);
 
@@ -374,6 +447,18 @@ class ItemServiceImplTest {
 
         assertThrows(NotFoundException.class,
                 () -> itemService.deleteById(userOleg.getId(), dryer.getId()));
+    }
+
+    @Test
+    void deleteAll_shouldBeSuccess() {
+        lenient()
+                .when(mockItemRepository.findAll())
+                .thenReturn(List.of(dryer));
+        itemService.deleteAll();
+
+        Mockito
+                .verify(mockItemRepository, Mockito.times(1))
+                .deleteAll();
     }
 
     @Test

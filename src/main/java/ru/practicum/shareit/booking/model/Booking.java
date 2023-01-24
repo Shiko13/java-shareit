@@ -1,6 +1,9 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.item.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -32,14 +35,4 @@ public class Booking {
     private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    @Override
-    public String toString() {
-        return "Booking{" +
-                "id=" + id +
-                ", start=" + start +
-                ", end=" + end +
-                ", status=" + status +
-                '}';
-    }
 }

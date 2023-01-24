@@ -92,6 +92,33 @@ class ItemRequestControllerTest {
     }
 
     @Test
+    void getById_shouldSuccess() throws Exception {
+        Mockito
+                .when(itemRequestService.getById(anyLong(), anyLong()))
+                .thenReturn(requestWithItems);
+
+        mvc.perform(
+                        get("/requests/{requestId}", request.getId())
+                                .header("X-Sharer-User-Id", userOleg.getId())
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(requestWithItems.getId()), Long.class))
+                .andExpect(jsonPath("$.description", is(requestWithItems.getDescription())))
+                .andExpect(jsonPath("$.created", is(created)))
+                .andExpect(jsonPath("$.items[0].id",
+                        is(dryer.getId()), Long.class))
+                .andExpect(
+                        jsonPath("$.items[0].description",
+                                is(dryer.getDescription()))
+                );
+
+        Mockito.verify(itemRequestService, Mockito.times(1))
+                .getById(1L, 4L);
+    }
+
+    @Test
     void getAll_shouldSuccess() throws Exception {
         Mockito
                 .when(itemRequestService.getAll(anyLong()))

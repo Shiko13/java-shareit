@@ -286,6 +286,22 @@ class ItemControllerTest {
     }
 
     @Test
+    void deleteAll_shouldSuccess() throws Exception {
+        itemService.deleteAll();
+
+        Mockito
+                .verify(itemService, Mockito.times(1))
+                .deleteAll();
+
+        mvc.perform(
+                        delete("/items")
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void getByText_shouldSuccess() throws Exception {
         Mockito
                 .when(itemService.getByText(anyString(), anyInt(), anyInt()))

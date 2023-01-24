@@ -434,6 +434,7 @@ class BookingServiceImplTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> bookingService.updateStatus(1L, 7L, true)
+
         );
     }
 }
