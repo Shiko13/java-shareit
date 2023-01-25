@@ -8,11 +8,11 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "comments")
 public class Comment {
 
     @Id
@@ -29,13 +29,4 @@ public class Comment {
     private User author;
     @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
-
-    @Override
-    public String toString() {
-        return "Comment{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
-                ", created=" + created +
-                '}';
-    }
 }

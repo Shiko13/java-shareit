@@ -2,8 +2,13 @@ package ru.practicum.shareit.user.dto;
 
 import ru.practicum.shareit.user.model.User;
 
-public interface UserDtoConverter {
-    UserDto toDto(User user);
+public class UserDtoConverter {
 
-    User fromDto(UserDto userDto);
+    public static UserDto toDto(User user) {
+        return new UserDto(user.getId(), user.getName(), user.getEmail());
+    }
+
+    public static User fromDto(UserDto userDto) {
+        return new User(userDto.getId(), userDto.getName(), userDto.getEmail());
+    }
 }
