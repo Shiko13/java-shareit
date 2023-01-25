@@ -30,7 +30,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByItem_Owner_Id(long ownerId, Pageable pageable);
 
     List<Booking> findBookingsByItem_Owner_IdAndStartBeforeAndEndAfter(long ownerId,
-                                                                   LocalDateTime start, LocalDateTime end,
+                                                                       LocalDateTime start, LocalDateTime end,
                                                                        Pageable pageable);
 
     List<Booking> findBookingsByItem_Owner_IdAndEndBefore(long ownerId, LocalDateTime end,
@@ -40,10 +40,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findBookingsByItem_Owner_IdAndStatus(long ownerId, Status status, Pageable pageable);
 
-    List<Booking> findBookingsByBooker_IdAndItem_IdAndEndIsBefore(long bookerId, long itemId,
-                                                                  LocalDateTime localDateTime);
+    List<Booking> findBookingsByBooker_IdAndItem_IdAndEndIsLessThanEqual(long bookerId, long itemId,
+                                                                         LocalDateTime localDateTime);
 
-    Optional<Booking> findFirstByItem_IdAndStartBeforeOrderByEndDesc(long id, LocalDateTime localDateTime);
+    Optional<Booking> findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(long id, LocalDateTime localDateTime);
 
     Optional<Booking> findFirstByItem_IdAndStartAfterOrderByEndDesc(long id, LocalDateTime localDateTime);
 

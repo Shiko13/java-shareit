@@ -164,7 +164,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() ->
                         new NotFoundException("Item with id = " + itemId + " not found"));
 
-        List<Booking> bookings = bookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsBefore(userId,
+        List<Booking> bookings = bookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsLessThanEqual(userId,
                 itemId, LocalDateTime.now());
         if (bookings.stream().findAny().isEmpty()) {
             throw new CommentAccessException("You are not booked this item");
@@ -193,7 +193,7 @@ public class ItemServiceImpl implements ItemService {
         BookingDtoOnlyIdAndBookerId lastBooking = null;
         BookingDtoOnlyIdAndBookerId nextBooking = null;
         if (item.getOwner().getId() == sharerId) {
-            lastBooking = bookingRepository.findFirstByItem_IdAndStartBeforeOrderByEndDesc(item.getId(),
+            lastBooking = bookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(item.getId(),
                             LocalDateTime.now())
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);

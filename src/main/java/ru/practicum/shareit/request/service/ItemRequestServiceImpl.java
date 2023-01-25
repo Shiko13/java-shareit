@@ -20,7 +20,11 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -85,18 +89,20 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .map(ItemRequest::getId)
                 .collect(Collectors.toList());
         List<Item> items = itemRepository.findByRequest_IdIn(requestsId);
+        Map<ItemRequest, List<Item>> itemRequestsByItem = items.stream()
+                .collect(groupingBy(Item::getRequest, toList()));
+        List<ItemRequestDtoOutput> itemRequestDtoOutputs = new ArrayList<>();
 
-        return requests.stream()
-                .map(i -> ItemRequestDtoConverter.toDtoOutput(i, getItemsByRequestId(i.getId(), items)))
-                .collect(Collectors.toList());
-    }
+        for (ItemRequest itemRequest : requests) {
+            List<ItemDtoForRequest> requestItemsDto = new ArrayList<>();
+            if (itemRequestsByItem.get(itemRequest) != null) {
+                List<Item> requestItems = itemRequestsByItem.get(itemRequest);
+                requestItemsDto = requestItems.stream().map(ItemDtoConverter::toDtoForRequest).collect(toList());
+            }
+            ItemRequestDtoOutput itemRequestDtoOutput = ItemRequestDtoConverter.toDtoOutput(itemRequest, requestItemsDto);
+            itemRequestDtoOutputs.add(itemRequestDtoOutput);
+        }
 
-    private List<ItemDtoForRequest> getItemsByRequestId(long requestId, List<Item> items) {
-        List<Item> itemsForMapping = items
-                .stream()
-                .filter(item -> item.getRequest().getId() == requestId)
-                .collect(Collectors.toList());
-
-        return ItemDtoConverter.toDtoListForRequest(itemsForMapping);
+        return itemRequestDtoOutputs;
     }
 }

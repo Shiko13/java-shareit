@@ -133,7 +133,7 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userIrina.getId()))
                 .thenReturn(Optional.of(userIrina));
         Mockito
-                .when(mockBookingRepository.findFirstByItem_IdAndStartBeforeOrderByEndDesc(
+                .when(mockBookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(
                         eq(dryer.getId()),
                         any(LocalDateTime.class)))
                 .thenReturn(Optional.of(lastBooking));
@@ -188,7 +188,7 @@ class ItemServiceImplTest {
         Mockito
                 .when(mockItemRepository.findById(dryer.getId())).thenReturn(Optional.of(dryer));
         Mockito
-                .when(mockBookingRepository.findFirstByItem_IdAndStartBeforeOrderByEndDesc(
+                .when(mockBookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(
                         eq(dryer.getId()),
                         any(LocalDateTime.class)))
                 .thenReturn(Optional.of(lastBooking));
@@ -487,7 +487,7 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userOleg.getId()))
                 .thenReturn(Optional.of(userOleg));
         Mockito
-                .when(mockBookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsBefore(
+                .when(mockBookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsLessThanEqual(
                                 eq(userOleg.getId()),
                                 eq(dryer.getId()),
                                 any(LocalDateTime.class)
@@ -544,7 +544,7 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userOleg.getId()))
                 .thenReturn(Optional.of(userOleg));
         Mockito
-                .when(mockBookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsBefore(
+                .when(mockBookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsLessThanEqual(
                                 eq(userOleg.getId()),
                                 eq(dryer.getId()),
                                 any(LocalDateTime.class)
