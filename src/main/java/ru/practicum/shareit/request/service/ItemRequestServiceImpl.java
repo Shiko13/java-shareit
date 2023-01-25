@@ -94,13 +94,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<ItemRequestDtoOutput> itemRequestDtoOutputs = new ArrayList<>();
 
         for (ItemRequest itemRequest : requests) {
-            List<ItemDtoForRequest> requestItemsDto = new ArrayList<>();
-            if (itemRequestsByItem.get(itemRequest) != null) {
-                List<Item> requestItems = itemRequestsByItem.get(itemRequest);
-                requestItemsDto = requestItems.stream().map(ItemDtoConverter::toDtoForRequest).collect(toList());
-            }
-            ItemRequestDtoOutput itemRequestDtoOutput = ItemRequestDtoConverter.toDtoOutput(itemRequest, requestItemsDto);
-            itemRequestDtoOutputs.add(itemRequestDtoOutput);
+            List<Item> itemsTemp = itemRequestsByItem.getOrDefault(itemRequest, new ArrayList<>());
+            List<ItemDtoForRequest> itemDtoForRequests = itemsTemp.stream()
+                    .map(ItemDtoConverter::toDtoForRequest)
+                    .collect(toList());
+            itemRequestDtoOutputs.add(ItemRequestDtoConverter.toDtoOutput(itemRequest, itemDtoForRequests));
         }
 
         return itemRequestDtoOutputs;

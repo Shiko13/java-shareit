@@ -59,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
         Map<Item, List<Comment>> commentsByItem = comments.stream()
                 .collect(groupingBy(Comment::getItem, toList()));
 
-        List<Booking> lastBookings = bookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemsId);
+        List<Booking> lastBookings = bookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(itemsId);
         Map<Item, List<Booking>> bookingsByItem = lastBookings.stream()
                 .collect(groupingBy(Booking::getItem, toList()));
 
@@ -193,12 +193,12 @@ public class ItemServiceImpl implements ItemService {
         BookingDtoOnlyIdAndBookerId lastBooking = null;
         BookingDtoOnlyIdAndBookerId nextBooking = null;
         if (item.getOwner().getId() == sharerId) {
-            lastBooking = bookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(item.getId(),
+            lastBooking = bookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndAsc(item.getId(),
                             LocalDateTime.now())
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);
 
-            nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByEndDesc(item.getId(),
+            nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByEndAsc(item.getId(),
                             LocalDateTime.now())
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);

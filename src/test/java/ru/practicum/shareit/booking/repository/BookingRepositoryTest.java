@@ -68,7 +68,7 @@ class BookingRepositoryTest {
 
     @Test
     void shouldFindByItemId_AndStartBefore_OrderByEndDesc() {
-        List<Booking> result = bookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(setIds);
+        List<Booking> result = bookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(setIds);
 
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getId()).isEqualTo(bookingCurrent.getId());

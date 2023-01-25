@@ -43,13 +43,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByBooker_IdAndItem_IdAndEndIsLessThanEqual(long bookerId, long itemId,
                                                                          LocalDateTime localDateTime);
 
-    Optional<Booking> findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(long id, LocalDateTime localDateTime);
+    Optional<Booking> findFirstByItem_IdAndStartIsLessThanEqualOrderByEndAsc(long id, LocalDateTime localDateTime);
 
-    Optional<Booking> findFirstByItem_IdAndStartAfterOrderByEndDesc(long id, LocalDateTime localDateTime);
+    Optional<Booking> findFirstByItem_IdAndStartAfterOrderByEndAsc(long id, LocalDateTime localDateTime);
 
     @Query(value = "select b from Booking as b where b.item.id in ?1 and b.status = 'APPROVED'" +
             " and b.start <= current_timestamp order by b.end desc")
-    List<Booking> findByItem_IdInAndStartBeforeOrderByEndDesc(Set<Long> itemsId);
+    List<Booking> findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(Set<Long> itemsId);
 
     @Query(value = "select b from Booking as b where b.item.id in ?1 and b.status = 'APPROVED'" +
             " and b.start > current_timestamp order by b.end asc")

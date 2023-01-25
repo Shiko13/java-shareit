@@ -133,12 +133,12 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userIrina.getId()))
                 .thenReturn(Optional.of(userIrina));
         Mockito
-                .when(mockBookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(
+                .when(mockBookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndAsc(
                         eq(dryer.getId()),
                         any(LocalDateTime.class)))
                 .thenReturn(Optional.of(lastBooking));
         Mockito
-                .when(mockBookingRepository.findFirstByItem_IdAndStartAfterOrderByEndDesc(
+                .when(mockBookingRepository.findFirstByItem_IdAndStartAfterOrderByEndAsc(
                         eq(dryer.getId()),
                         any(LocalDateTime.class)))
                 .thenReturn(Optional.of(nextBooking));
@@ -188,12 +188,12 @@ class ItemServiceImplTest {
         Mockito
                 .when(mockItemRepository.findById(dryer.getId())).thenReturn(Optional.of(dryer));
         Mockito
-                .when(mockBookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndDesc(
+                .when(mockBookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndAsc(
                         eq(dryer.getId()),
                         any(LocalDateTime.class)))
                 .thenReturn(Optional.of(lastBooking));
         Mockito
-                .when(mockBookingRepository.findFirstByItem_IdAndStartAfterOrderByEndDesc(
+                .when(mockBookingRepository.findFirstByItem_IdAndStartAfterOrderByEndAsc(
                         eq(dryer.getId()),
                         any(LocalDateTime.class)))
                 .thenReturn(Optional.of(nextBooking));
@@ -244,7 +244,7 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userIrina.getId()))
                 .thenReturn(Optional.of(userIrina));
         lenient()
-                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemIds))
+                .when(mockBookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(itemIds))
                 .thenReturn(List.of(lastBooking, nextBooking));
         ItemDtoWithBookingAndComments expected = new ItemDtoWithBookingAndComments(
                 dryer.getId(),
@@ -269,7 +269,7 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userIrina.getId()))
                 .thenReturn(Optional.of(userIrina));
         lenient()
-                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemIds))
+                .when(mockBookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(itemIds))
                 .thenReturn(List.of(lastBooking, nextBooking));
         Mockito
                 .when(mockCommentRepository.findByItem_IdIn(anySet()))
@@ -297,13 +297,13 @@ class ItemServiceImplTest {
                 .when(mockUserRepository.findById(userIrina.getId()))
                 .thenReturn(Optional.of(userIrina));
         lenient()
-                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(itemIds))
+                .when(mockBookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(itemIds))
                 .thenReturn(List.of(lastBooking, nextBooking));
         Mockito
                 .when(mockCommentRepository.findByItem_IdIn(anySet()))
                 .thenReturn(List.of(comment));
         Mockito
-                .when(mockBookingRepository.findByItem_IdInAndStartBeforeOrderByEndDesc(anySet()))
+                .when(mockBookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(anySet()))
                 .thenReturn(List.of(lastBooking));
         Mockito
                 .when(mockBookingRepository.findByItem_IdInAndStartAfterOrderByEndAsc(anySet()))
