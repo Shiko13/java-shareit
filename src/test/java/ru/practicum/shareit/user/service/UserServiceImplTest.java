@@ -114,4 +114,11 @@ class UserServiceImplTest {
         Mockito
                 .verify(mockUserRepository, Mockito.times(1)).deleteById(userOleg.getId());
     }
+
+    @Test
+    void deleteAll_shouldBeSuccess() {
+        userService.deleteAll();
+        Mockito
+                .verify(mockUserRepository, Mockito.times(1)).deleteAll();
+    }
 }
