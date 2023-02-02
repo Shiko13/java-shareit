@@ -59,11 +59,11 @@ public class ItemServiceImpl implements ItemService {
         Map<Item, List<Comment>> commentsByItem = comments.stream()
                 .collect(groupingBy(Comment::getItem, toList()));
 
-        List<Booking> lastBookings = bookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(itemsId, LocalDateTime.now().plusHours(4L));
+        List<Booking> lastBookings = bookingRepository.findByItem_IdInAndStartIsLessThanEqualOrderByEndDesc(itemsId, LocalDateTime.now());
         Map<Item, List<Booking>> bookingsByItem = lastBookings.stream()
                 .collect(groupingBy(Booking::getItem, toList()));
 
-        List<Booking> nextBookings = bookingRepository.findByItem_IdInAndStartAfterOrderByEndAsc(itemsId, LocalDateTime.now().plusHours(4L));
+        List<Booking> nextBookings = bookingRepository.findByItem_IdInAndStartAfterOrderByEndAsc(itemsId, LocalDateTime.now());
         Map<Item, List<Booking>> bookingsByItem2 = nextBookings.stream()
                 .collect(groupingBy(Booking::getItem, toList()));
 
@@ -165,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
                         new NotFoundException("Item with id = " + itemId + " not found"));
 
         List<Booking> bookings = bookingRepository.findBookingsByBooker_IdAndItem_IdAndEndIsLessThanEqual(userId,
-                itemId, LocalDateTime.now().plusHours(4L));
+                itemId, LocalDateTime.now());
         if (bookings.stream().findAny().isEmpty()) {
             throw new CommentAccessException("You are not booked this item");
         }
@@ -194,12 +194,12 @@ public class ItemServiceImpl implements ItemService {
         BookingDtoOnlyIdAndBookerId nextBooking = null;
         if (item.getOwner().getId() == sharerId) {
             lastBooking = bookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndAsc(item.getId(),
-                            LocalDateTime.now().plusHours(4L))
+                            LocalDateTime.now())
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);
 
             nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByEndAsc(item.getId(),
-                            LocalDateTime.now().plusHours(4L))
+                            LocalDateTime.now())
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);
         }

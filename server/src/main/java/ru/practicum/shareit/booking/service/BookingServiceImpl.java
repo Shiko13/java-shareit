@@ -122,11 +122,11 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookings = bookingRepository.findBookingsByBooker_IdAndStartBeforeAndEndAfter(userId,
-                        LocalDateTime.now().plusHours(4L), LocalDateTime.now().plusHours(4L), pageable);
+                        LocalDateTime.now(), LocalDateTime.now(), pageable);
                 break;
             case PAST:
                 bookings = bookingRepository.findBookingsByBooker_IdAndEndBefore(userId,
-                        LocalDateTime.now().plusHours(4L), pageable);
+                        LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
                 bookings = bookingRepository.findBookingsByBooker_IdAndStartAfter(userId,
@@ -163,11 +163,11 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case CURRENT:
                 bookings = bookingRepository.findBookingsByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId,
-                        LocalDateTime.now().plusHours(4L), LocalDateTime.now().plusHours(4L), pageable);
+                        LocalDateTime.now(), LocalDateTime.now(), pageable);
                 break;
             case PAST:
                 bookings = bookingRepository.findBookingsByItem_Owner_IdAndEndBefore(ownerId,
-                        LocalDateTime.now().plusHours(4L), pageable);
+                        LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
                 bookings = bookingRepository.findBookingsByItem_Owner_IdAndStartAfter(ownerId,
