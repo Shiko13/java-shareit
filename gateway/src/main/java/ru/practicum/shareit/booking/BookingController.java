@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.exception.TimeException;
 import ru.practicum.shareit.exception.UnknownStateException;
 
 import javax.validation.Valid;
@@ -37,6 +38,9 @@ public class BookingController {
     public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") long userId,
                                            @RequestBody @Valid BookItemRequestDto requestDto) {
         log.info("Creating booking {}, userId={}", requestDto, userId);
+        if (!requestDto.getStart().isBefore(requestDto.getEnd())) {
+            throw new TimeException("You are not in Nolan movie :)");
+        }
         return bookingClient.bookItem(userId, requestDto);
     }
 
