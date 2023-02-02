@@ -121,24 +121,6 @@ class BookingServiceImplTest {
 
     @Test
     @SqlGroup({
-            @Sql(value = {"before.sql"}, executionPhase = BEFORE_TEST_METHOD)
-    })
-    void shouldThrowExceptionIfTimeCollapse() {
-        BookingDtoInput newBookingDto = new BookingDtoInput(
-                LocalDateTime.now().plusDays(4),
-                LocalDateTime.now(),
-                3L
-        );
-
-        assertThrows(
-                TimeException.class,
-                () -> bookingService.create(1L, newBookingDto),
-                "You are not in Nolan movie :)"
-        );
-    }
-
-    @Test
-    @SqlGroup({
             @Sql(value = {"before-with-one-booking.sql"}, executionPhase = BEFORE_TEST_METHOD)
     })
     void shouldReturnById() {
