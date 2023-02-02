@@ -19,6 +19,6 @@ public class ItemRequestDtoConverter {
 
     public static ItemRequest fromDtoInput(ItemRequestDtoInput itemRequest, User owner) {
         return new ItemRequest(itemRequest.getId(), itemRequest.getDescription(),
-                owner, itemRequest.getCreated() == null ? LocalDateTime.now().plusHours(4L) : itemRequest.getCreated());
+                owner, itemRequest.getCreated() == null ? LocalDateTime.now() : itemRequest.getCreated());
     }
 }
