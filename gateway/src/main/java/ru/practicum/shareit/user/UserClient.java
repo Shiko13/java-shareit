@@ -42,7 +42,7 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> deleteUser(long id) {
-        System.out.println("Gateway userClient delete userId = " + id);
+
         return delete("/" + id);
     }
 }

@@ -62,7 +62,7 @@ public class BookingController {
                                                 @Positive @RequestParam(name = "size", defaultValue = "10") int size) {
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(UnknownStateException::new);
-        System.out.println("BookingState равен = " + state.name());
+
         return bookingClient.getBookingsByOwner(ownerId, state, from, size);
     }
 }

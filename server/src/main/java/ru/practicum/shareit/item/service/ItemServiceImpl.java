@@ -193,25 +193,15 @@ public class ItemServiceImpl implements ItemService {
         BookingDtoOnlyIdAndBookerId lastBooking = null;
         BookingDtoOnlyIdAndBookerId nextBooking = null;
         if (item.getOwner().getId() == sharerId) {
-            List<Booking> bookings = bookingRepository.findAll();
-            for (Booking booking : bookings) {
-                System.out.println("sharerId = " + sharerId + " " + "itemId = " + item.getId());
-                System.out.println("Информация о бронированиях: " + booking.getId() + " " +  booking.getItem().getId() +
-                        " " + booking.getBooker().getId() + " " + booking.getStart() +
-                        " " + booking.getEnd());
-            }
             lastBooking = bookingRepository.findFirstByItem_IdAndStartIsLessThanEqualOrderByEndAsc(item.getId(),
                             LocalDateTime.now().plusHours(4L))
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);
-            System.out.println("lastBooking равен" + lastBooking);
-            System.out.println("Текущее время" + LocalDateTime.now());
 
             nextBooking = bookingRepository.findFirstByItem_IdAndStartAfterOrderByEndAsc(item.getId(),
                             LocalDateTime.now().plusHours(4L))
                     .map(BookingDtoConverter::toDtoOnlyIdAndBookerId)
                     .orElse(null);
-            System.out.println("nextBooking равен" + nextBooking);
         }
         List<CommentDto> comments = commentRepository.findByItem_Id(item.getId()).stream()
                 .map(CommentDtoConverter::toDto)

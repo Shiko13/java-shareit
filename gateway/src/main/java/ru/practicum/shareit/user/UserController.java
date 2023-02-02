@@ -39,7 +39,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Object> deleteById(@PathVariable long userId) {
-        System.out.println("Gateway controller delete userId = " + userId);
+
         return userClient.deleteUser(userId);
     }
 
