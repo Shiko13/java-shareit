@@ -19,7 +19,7 @@
 Запустить сервис можно в IntelliJ IDEA:
 - выполнив docker-compose.yml (для запуска в Docker)
 - или выполнить java-shareit/server/src/main/resources/schema.sql -> "run"(для инициализации БД),
-  затем поочерёдно запустить модули «shareit-server» (основной сервис)  и «shareit-gateway» (шлюз) выполнив:
-    * java-shareit/server/src/main/java/ru/practicum/shareit/ShareitServer -> "run";
-    * java-shareit/gateway/src/main/java/ru/practicum/shareit/ShareitGateway -> "run";
+  затем поочерёдно запустить модули «server» (основной сервис) и «gateway» (шлюз) выполнив:
+    * java-shareit/server/src/main/java/ru/practicum/shareit/ShareItApp -> "run";
+    * java-shareit/gateway/src/main/java/ru/practicum/shareit/ShareItGateway -> "run";
 
